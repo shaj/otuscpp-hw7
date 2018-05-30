@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "version.h"
+#include "bulk.h"
 
 
 #include <boost/program_options.hpp>
@@ -51,9 +52,9 @@ int main (int argc, char* argv[])
 			// logging::core::get()->set_logging_enabled(true);	
 		}
 
-		Bulk_Reader reader(std::cin);
-		Bulk_Printer console(reader);
-		Bulk_Printer file(reader);
+		Bulk_Reader reader(std::cin, vm["bulk"].as<size_t>());
+		Con_Printer console(reader);
+		File_Printer file(reader);
 
 		reader.process();
 
