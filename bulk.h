@@ -8,7 +8,7 @@
 class Bulk
 {
 	std::vector<std::string> data;
-	std::string id;
+	std::string m_id;
 public:
 
 	Bulk();
@@ -17,6 +17,8 @@ public:
 	auto end()->decltype(data.end());
 
 	void append(const std::string &s);
+
+	std::string id();
 };
 
 

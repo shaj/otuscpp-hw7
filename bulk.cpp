@@ -12,7 +12,7 @@ Bulk::Bulk()
 	std::cout << "Bulk::Bulk()" << std::endl;
 
 	std::time_t t = std::time(nullptr);
-	id = std::to_string((long long)t);
+	m_id = std::to_string((long long)t);
 }
 
 auto Bulk::begin()->decltype(data.begin())
@@ -34,6 +34,11 @@ void Bulk::append(const std::string &s)
 	std::cout << "void Bulk::append" << std::endl;
 
 	data.push_back(s);
+}
+
+std::string Bulk::id()
+{
+	return m_id;
 }
 
 
@@ -61,17 +66,17 @@ void Bulk_Reader::process()
 {
 	std::cout << "void Bulk_Reader::process()" << std::endl;
 
-	// if(*is != nullptr)
-	// {
+	if(is)
+	{
 		std::string str;
 		int bulk_cnt = bulk_size;
 		create_bulk();
-		while(std::getline(is, str).good())
+		while(std::getline(is, str))
 		{
 			append_bulk(str);
 		}
 		close_bulk();
-	// }
+	}
 }
 
 
@@ -107,6 +112,8 @@ void Bulk_Reader::append_bulk(const std::string &s)
 		{
 			notify(*(--bulks.end()));
 			create_bulk();
+			(--bulks.end())->append(s);
+			bulk_cnt--;
 		}
 	}
 	else
@@ -162,7 +169,7 @@ void Con_Printer::update(Bulk &b)
 {
 	std::cout << "void Con_Printer::update" << std::endl;
 
-	std::cout << "bulk: ";
+	std::cout << "bulk " << b.id() << ": ";
 	auto it = b.begin();
 	std::cout << *it;
 	it++;
@@ -184,5 +191,9 @@ void File_Printer::update(Bulk &b)
 {
 	std::cout << "void File_Printer::update" << std::endl;
 
+	std::string fname {"bulk" + b.id() + ".log"};
+	std::fstream fs;
+	fs.open(fname);
+	
 }
 

@@ -1,3 +1,8 @@
+cmd100
+cmd101
+cmd102
+cmd103
+cmd104
 {
 cmd1
 cmd2
@@ -11,3 +16,8 @@ cmd7
 cmd8
 cmd9
 }
+cmd200
+cmd201
+cmd202
+cmd203
+cmd204
