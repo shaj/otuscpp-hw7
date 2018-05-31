@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <ctime>
 
@@ -191,9 +192,42 @@ void File_Printer::update(Bulk &b)
 {
 	std::cout << "void File_Printer::update" << std::endl;
 
-	std::string fname {"bulk" + b.id() + ".log"};
+	std::string fname {"bulk" + b.id()};
 	std::fstream fs;
-	fs.open(fname);
-	
+	fs.open(fname + ".log", std::ios::in);
+	if(fs)
+	{
+		int cnt = 1;
+		std::string fname_new;
+		while(fs)
+		{
+			fs.close();
+			fname_new = fname + "_" + std::to_string(cnt);
+			fs.open(fname_new + ".log");
+			cnt++;
+			if(cnt > 10000) throw std::logic_error("Can not create log file");
+		}
+		fname = fname_new;
+	}
+	fs.close();
+	std::cout << "   fname=" << fname << std::endl;
+	fs.open(fname + ".log", std::ios::out);
+
+	for(const auto &it: b)
+	{
+		fs << it << std::endl;
+	}
+	// auto it = b.begin();
+	// fs << *it;
+	// it++;
+	// for(; it != b.end(); it++)
+	// {
+	// 	fs << ", " << *it;
+	// }
+	// fs << std::endl;
+	fs.close();
 }
+
+
+
 
