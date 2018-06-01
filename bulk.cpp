@@ -5,12 +5,12 @@
 #include <ctime>
 
 #include "bulk.h"
-
+#include "log.h"
 
 
 Bulk::Bulk()
 {
-	std::cout << "Bulk::Bulk()" << std::endl;
+	SPDLOG_TRACE(my::my_logger, "Bulk::Bulk()");
 
 	std::time_t t = std::time(nullptr);
 	m_id = std::to_string((long long)t);
@@ -18,21 +18,21 @@ Bulk::Bulk()
 
 auto Bulk::begin()->decltype(data.begin())
 {
-	std::cout << "auto Bulk::begin()" << std::endl;
+	SPDLOG_TRACE(my::my_logger, "auto Bulk::begin()");
 
 	return data.begin();
 }
 
 auto Bulk::end()->decltype(data.end())
 {
-	std::cout << "auto Bulk::end()" << std::endl;
+	SPDLOG_TRACE(my::my_logger, "auto Bulk::end()");
 
 	return data.end();
 }
 
 void Bulk::append(const std::string &s)
 {
-	std::cout << "void Bulk::append" << std::endl;
+	SPDLOG_TRACE(my::my_logger, "void Bulk::append");
 
 	data.push_back(s);
 }
@@ -49,23 +49,23 @@ Bulk_Reader::Bulk_Reader(std::istream &_is, std::size_t c) :
 		bulk_size(c),
 		level(0)
 {
-	std::cout << "Bulk_Reader::Bulk_Reader" << std::endl;
+	SPDLOG_TRACE(my::my_logger, "Bulk_Reader::Bulk_Reader");
 
 	if(bulk_size < 1) bulk_size = 1;
 
-	std::cout << "   bulk_size=" << bulk_size << std::endl;
+	SPDLOG_TRACE(my::my_logger, "   bulk_size={}", bulk_size);
 }
 
 void Bulk_Reader::add_printer(Bulk_Printer *p)
 {
-	std::cout << "void Bulk_Reader::add_printer" << std::endl;
+	SPDLOG_TRACE(my::my_logger, "void Bulk_Reader::add_printer");
 
 	printers.push_back(p);
 }
 
 void Bulk_Reader::process()
 {
-	std::cout << "void Bulk_Reader::process()" << std::endl;
+	SPDLOG_TRACE(my::my_logger, "void Bulk_Reader::process()");
 
 	if(is)
 	{
@@ -83,7 +83,7 @@ void Bulk_Reader::process()
 
 void Bulk_Reader::create_bulk()
 {
-	std::cout << "void Bulk_Reader::create_bulk()" << std::endl;
+	SPDLOG_TRACE(my::my_logger, "void Bulk_Reader::create_bulk()");
 
 	bulks.emplace_back();
 	bulk_cnt = bulk_size;
@@ -91,7 +91,7 @@ void Bulk_Reader::create_bulk()
 
 void Bulk_Reader::append_bulk(const std::string &s)
 {
-	std::cout << "void Bulk_Reader::append_bulk" << std::endl;
+	SPDLOG_TRACE(my::my_logger, "void Bulk_Reader::append_bulk");
 
 	if(level == 0)
 	{
@@ -134,7 +134,7 @@ void Bulk_Reader::append_bulk(const std::string &s)
 
 void Bulk_Reader::close_bulk()
 {
-	std::cout << "void Bulk_Reader::close_bulk()" << std::endl;
+	SPDLOG_TRACE(my::my_logger, "void Bulk_Reader::close_bulk()");
 
 	if((level == 0) && (bulk_cnt != bulk_size))
 		notify(*(--bulks.end()));
@@ -142,7 +142,7 @@ void Bulk_Reader::close_bulk()
 
 void Bulk_Reader::notify(Bulk &b)
 {
-	std::cout << "void Bulk_Reader::notify" << std::endl;
+	SPDLOG_TRACE(my::my_logger, "void Bulk_Reader::notify");
 
 	for(const auto it: printers)
 	{
@@ -154,7 +154,7 @@ void Bulk_Reader::notify(Bulk &b)
 
 Bulk_Printer::Bulk_Printer(Bulk_Reader &r)
 {
-	std::cout << "Bulk_Printer::Bulk_Printer" << std::endl;
+	SPDLOG_TRACE(my::my_logger, "Bulk_Printer::Bulk_Printer");
 
 	r.add_printer(this);
 }
@@ -162,13 +162,13 @@ Bulk_Printer::Bulk_Printer(Bulk_Reader &r)
 
 Con_Printer::Con_Printer(Bulk_Reader &r) : Bulk_Printer(r)
 {
-	std::cout << "Con_Printer::Con_Printer" << std::endl;
+	SPDLOG_TRACE(my::my_logger, "Con_Printer::Con_Printer");
 
 }
 
 void Con_Printer::update(Bulk &b) 
 {
-	std::cout << "void Con_Printer::update" << std::endl;
+	SPDLOG_TRACE(my::my_logger, "void Con_Printer::update");
 
 	std::cout << "bulk " << b.id() << ": ";
 	auto it = b.begin();
@@ -184,13 +184,13 @@ void Con_Printer::update(Bulk &b)
 
 File_Printer::File_Printer(Bulk_Reader &r) : Bulk_Printer(r)
 {
-	std::cout << "File_Printer::File_Printer" << std::endl;
+	SPDLOG_TRACE(my::my_logger, "File_Printer::File_Printer");
 
 }
 
 void File_Printer::update(Bulk &b) 
 {
-	std::cout << "void File_Printer::update" << std::endl;
+	SPDLOG_TRACE(my::my_logger, "void File_Printer::update");
 
 	std::string fname {"bulk" + b.id()};
 	std::fstream fs;
@@ -210,21 +210,13 @@ void File_Printer::update(Bulk &b)
 		fname = fname_new;
 	}
 	fs.close();
-	std::cout << "   fname=" << fname << std::endl;
+	SPDLOG_TRACE(my::my_logger, "   fname={}", fname);
 	fs.open(fname + ".log", std::ios::out);
 
 	for(const auto &it: b)
 	{
 		fs << it << std::endl;
 	}
-	// auto it = b.begin();
-	// fs << *it;
-	// it++;
-	// for(; it != b.end(); it++)
-	// {
-	// 	fs << ", " << *it;
-	// }
-	// fs << std::endl;
 	fs.close();
 }
 

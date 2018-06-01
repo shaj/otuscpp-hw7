@@ -30,19 +30,17 @@ set_target_properties(bulk test_bulk PROPERTIES
 target_link_libraries(bulk
   ${Boost_LIBRARIES}
   ${Boost_SYSTEM_LIBRARY}
-  ${Boost_LOG_LIBRARY}
-  ${Boost_LOG_SETUP_LIBRARY}
   ${Boost_THREAD_LIBRARY}
   ${CMAKE_THREAD_LIBS_INIT}
 )
+
+target_compile_definitions(bulk PRIVATE SPDLOG_TRACE_ON)
 
 
 target_link_libraries(test_bulk
   ${Boost_UNIT_TEST_LIBRARIES}
   ${Boost_LIBRARIES}
   ${Boost_SYSTEM_LIBRARY}
-  ${Boost_LOG_LIBRARY}
-  ${Boost_LOG_SETUP_LIBRARY}
   ${Boost_THREAD_LIBRARY}
   ${CMAKE_THREAD_LIBS_INIT}
 )
