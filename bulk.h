@@ -28,7 +28,7 @@ class Bulk_Printer;
 class Bulk_Reader
 {
 	std::list<Bulk> bulks;
-	std::vector<Bulk_Printer *> printers;
+	std::list<Bulk_Printer *> printers;
 	std::istream &is;
 	std::size_t bulk_size;
 	std::size_t bulk_cnt;
@@ -40,6 +40,7 @@ public:
 	Bulk_Reader(std::istream &_is, std::size_t c);
 
 	void add_printer(Bulk_Printer *p);
+	void remove_printer(Bulk_Printer *p);
 
 	void create_bulk();
 	void append_bulk(const std::string &s);
@@ -54,9 +55,12 @@ public:
 
 class Bulk_Printer
 {
+	Bulk_Reader *reader;
+
 	Bulk_Printer() = delete;
 public:
 	Bulk_Printer(Bulk_Reader &r);
+	~Bulk_Printer();
 	virtual void update(Bulk &b) = 0;	
 };
 

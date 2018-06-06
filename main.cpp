@@ -24,7 +24,7 @@ int main (int argc, char* argv[])
 	try
 	{
 		my::my_logger = spdlog::basic_logger_st("mainlogger", "bulk.log", true);
-		my::my_logger->set_level(spdlog::level::trace);
+		my::my_logger->set_level(spdlog::level::info);
 		my::my_logger->info(" -=- Start bulk");
 
 		po::options_description descr("Allowed options");
@@ -50,16 +50,19 @@ int main (int argc, char* argv[])
 
 		if(vm.count("version"))
 		{
-			std::cout << "OTUS cpp" << std::endl;
-			std::cout << "Homework 7. Bulk." << std::endl;
-			std::cout << "Version " << VER << std::endl << std::endl;
+			std::cout << "OTUS cpp\n";
+			std::cout << "Homework 7. Bulk.\n";
+			std::cout << "Version " << VER << "\n" << std::endl;
 			return 0;
 		}
 
 		if(vm.count("debug"))
 		{
-			// logging::core::get()->set_logging_enabled(true);	
+			my::my_logger->set_level(spdlog::level::trace);
 		}
+
+
+
 
 		Bulk_Reader reader(std::cin, vm["bulk"].as<size_t>());
 		Con_Printer console(reader);
@@ -67,6 +70,10 @@ int main (int argc, char* argv[])
 
 		reader.process();
 
+
+
+
+		my::my_logger->info(" -=- End bulk");
 
 	}
 	catch(const std::exception &e)

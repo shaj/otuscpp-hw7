@@ -3,7 +3,7 @@
 
 #define BOOST_LOG_DYN_LINK 1
 
-#define BOOST_TEST_MODULE test_bulk
+#define BOOST_TEST_MODULE test_logic
 
 #include <boost/test/included/unit_test.hpp>
 #include "bulk.h"
@@ -26,7 +26,7 @@ public:
 };
 
 
-BOOST_AUTO_TEST_SUITE(test_bulk_suite)
+BOOST_AUTO_TEST_SUITE(bulk_logic_test_suite)
 
 BOOST_AUTO_TEST_CASE(test_bulk1) 
 {
@@ -124,32 +124,5 @@ BOOST_AUTO_TEST_CASE(test_bulk4)
 }
 
 
-BOOST_AUTO_TEST_CASE(test_bulk_remove_printer) 
-{
-
-	std::string in_data { "cmd0\n"
-						  "cmd2\n"
-						  "cmd3\n"
-						  "cmd4\n"
-						  "cmd5\n"
-						  "cmd6\n"
-						  "cmd7\n"
-						  "cmd8\n"
-						  "cmd9"
-	};
-	std::stringbuf in_buffer(in_data);
-	std::istream in_stream(&in_buffer);
-
-	Bulk_Reader reader(in_stream, 3);
-
-	Con_Printer console(reader);
-
-	File_Printer *pfile = new File_Printer(reader);
-
-	delete pfile;
-
-	BOOST_CHECK_NO_THROW(reader.process());
-	// BOOST_FAIL(1);
-}
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -63,6 +63,13 @@ void Bulk_Reader::add_printer(Bulk_Printer *p)
 	printers.push_back(p);
 }
 
+void Bulk_Reader::remove_printer(Bulk_Printer *p)
+{
+	SPDLOG_TRACE(my::my_logger, "void Bulk_Reader::remove_printer");
+
+	printers.remove(p);
+}
+
 void Bulk_Reader::process()
 {
 	SPDLOG_TRACE(my::my_logger, "void Bulk_Reader::process()");
@@ -152,11 +159,18 @@ void Bulk_Reader::notify(Bulk &b)
 
 
 
-Bulk_Printer::Bulk_Printer(Bulk_Reader &r)
+Bulk_Printer::Bulk_Printer(Bulk_Reader &r): reader(&r)
 {
 	SPDLOG_TRACE(my::my_logger, "Bulk_Printer::Bulk_Printer");
 
-	r.add_printer(this);
+	reader->add_printer(this);
+}
+
+Bulk_Printer::~Bulk_Printer()
+{
+	SPDLOG_TRACE(my::my_logger, "Bulk_Printer::~Bulk_Printer");
+
+	reader->remove_printer(this);
 }
 
 
