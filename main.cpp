@@ -64,11 +64,11 @@ int main (int argc, char* argv[])
 
 
 
-		Bulk_Reader reader(std::cin, vm["bulk"].as<size_t>());
-		Con_Printer console(reader);
-		File_Printer file(reader);
+		auto reader = std::make_shared<Bulk_Reader>(std::cin, vm["bulk"].as<size_t>());
+		auto console = Con_Printer::create(reader);
+		auto file = File_Printer::create(reader);
 
-		reader.process();
+		reader->process();
 
 
 

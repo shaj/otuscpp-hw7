@@ -3,6 +3,7 @@
 #include <vector>
 #include <list>
 #include <istream>
+#include <memory>
 
 
 class Bulk
@@ -28,7 +29,7 @@ class Bulk_Printer;
 class Bulk_Reader
 {
 	std::list<Bulk> bulks;
-	std::list<Bulk_Printer *> printers;
+	std::list<std::weak_ptr<Bulk_Printer>> printers;
 	std::istream &is;
 	std::size_t bulk_size;
 	std::size_t bulk_cnt;
@@ -39,8 +40,8 @@ class Bulk_Reader
 public:
 	Bulk_Reader(std::istream &_is, std::size_t c);
 
-	void add_printer(Bulk_Printer *p);
-	void remove_printer(Bulk_Printer *p);
+	void add_printer(const std::weak_ptr<Bulk_Printer> &p);
+	void remove_printer(const std::weak_ptr<Bulk_Printer> &p);
 
 	void create_bulk();
 	void append_bulk(const std::string &s);
@@ -55,29 +56,28 @@ public:
 
 class Bulk_Printer
 {
-	Bulk_Reader *reader;
-
-	Bulk_Printer() = delete;
+protected:
+	std::weak_ptr<Bulk_Reader> reader;
 public:
-	Bulk_Printer(Bulk_Reader &r);
-	~Bulk_Printer();
 	virtual void update(Bulk &b) = 0;	
 };
 
 
-class Con_Printer: Bulk_Printer
+class Con_Printer: public Bulk_Printer
 {
 	Con_Printer() = delete;
+	Con_Printer(const std::weak_ptr<Bulk_Reader> &r);
 public:	
-	Con_Printer(Bulk_Reader &r);
+	static std::shared_ptr<Con_Printer> create(const std::weak_ptr<Bulk_Reader> &r);
 	void update(Bulk &b) override;
 };
 
 
-class File_Printer: Bulk_Printer
+class File_Printer: public Bulk_Printer
 {
 	File_Printer() = delete;
+	File_Printer(const std::weak_ptr<Bulk_Reader> &r);
 public:	
-	File_Printer(Bulk_Reader &r);
+	static std::shared_ptr<File_Printer> create(const std::weak_ptr<Bulk_Reader> &r);
 	void update(Bulk &b) override;
 };

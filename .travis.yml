@@ -13,7 +13,9 @@ before_script:
 script:
   - cmake .
   - cmake --build .
+  - cd tests
   - cmake --build . --target test
+  - cd ..
   - cmake --build . --target package
   - doxygen
 deploy:

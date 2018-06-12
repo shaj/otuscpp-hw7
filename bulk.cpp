@@ -56,18 +56,22 @@ Bulk_Reader::Bulk_Reader(std::istream &_is, std::size_t c) :
 	SPDLOG_TRACE(my::my_logger, "   bulk_size={}", bulk_size);
 }
 
-void Bulk_Reader::add_printer(Bulk_Printer *p)
+void Bulk_Reader::add_printer(const std::weak_ptr<Bulk_Printer> &p)
 {
 	SPDLOG_TRACE(my::my_logger, "void Bulk_Reader::add_printer");
 
 	printers.push_back(p);
 }
 
-void Bulk_Reader::remove_printer(Bulk_Printer *p)
+void Bulk_Reader::remove_printer(const std::weak_ptr<Bulk_Printer> &prt)
 {
 	SPDLOG_TRACE(my::my_logger, "void Bulk_Reader::remove_printer");
 
-	printers.remove(p);
+    // Отсюда https://stackoverflow.com/a/10120851
+    printers.remove_if([prt](const auto &p)
+        { 
+            return !(p.owner_before(prt) || prt.owner_before(p));
+        });
 }
 
 void Bulk_Reader::process()
@@ -151,33 +155,20 @@ void Bulk_Reader::notify(Bulk &b)
 {
 	SPDLOG_TRACE(my::my_logger, "void Bulk_Reader::notify");
 
-	for(const auto it: printers)
+	for(const auto &it: printers)
 	{
-		it->update(b);
+		if(auto prt = it.lock())
+			prt->update(b);
 	}
 }
 
 
 
-Bulk_Printer::Bulk_Printer(Bulk_Reader &r): reader(&r)
-{
-	SPDLOG_TRACE(my::my_logger, "Bulk_Printer::Bulk_Printer");
 
-	reader->add_printer(this);
-}
-
-Bulk_Printer::~Bulk_Printer()
-{
-	SPDLOG_TRACE(my::my_logger, "Bulk_Printer::~Bulk_Printer");
-
-	reader->remove_printer(this);
-}
-
-
-Con_Printer::Con_Printer(Bulk_Reader &r) : Bulk_Printer(r)
+Con_Printer::Con_Printer(const std::weak_ptr<Bulk_Reader> &r)
 {
 	SPDLOG_TRACE(my::my_logger, "Con_Printer::Con_Printer");
-
+	reader = r;
 }
 
 void Con_Printer::update(Bulk &b) 
@@ -195,11 +186,21 @@ void Con_Printer::update(Bulk &b)
 	std::cout << std::endl;
 }
 
+std::shared_ptr<Con_Printer> Con_Printer::create(const std::weak_ptr<Bulk_Reader> &r)
+{
+	auto ret = std::shared_ptr<Con_Printer>(new Con_Printer(r));
+	r.lock()->add_printer(ret);
+	return ret;
+}
 
-File_Printer::File_Printer(Bulk_Reader &r) : Bulk_Printer(r)
+
+
+
+
+File_Printer::File_Printer(const std::weak_ptr<Bulk_Reader> &r)
 {
 	SPDLOG_TRACE(my::my_logger, "File_Printer::File_Printer");
-
+	reader = r;
 }
 
 void File_Printer::update(Bulk &b) 
@@ -234,6 +235,11 @@ void File_Printer::update(Bulk &b)
 	fs.close();
 }
 
-
+std::shared_ptr<File_Printer> File_Printer::create(const std::weak_ptr<Bulk_Reader> &r)
+{
+	auto ret = std::shared_ptr<File_Printer>(new File_Printer(r));
+	r.lock()->add_printer(ret);
+	return ret;
+}
 
 
