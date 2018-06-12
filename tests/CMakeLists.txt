@@ -1,5 +1,6 @@
 
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+find_package (Threads)
 
 add_executable(test_func test_func.cpp ../bulk.cpp)
 
@@ -18,10 +19,12 @@ target_include_directories(test_func PRIVATE ..)
 target_include_directories(test_logic PRIVATE ..)
 
 target_link_libraries(test_func
+  ${CMAKE_THREAD_LIBS_INIT}
   ${Boost_LIBRARIES}
 )
 
 target_link_libraries(test_logic
+  ${CMAKE_THREAD_LIBS_INIT}
   ${Boost_LIBRARIES}
 )
 

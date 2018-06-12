@@ -16,10 +16,12 @@ public:
 
 	auto begin()->decltype(data.begin());
 	auto end()->decltype(data.end());
+	const auto cbegin()->decltype(data.cbegin());
+	const auto cend()->decltype(data.cend());
 
 	void append(const std::string &s);
-
 	std::string id();
+	std::size_t size();
 };
 
 

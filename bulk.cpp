@@ -30,6 +30,20 @@ auto Bulk::end()->decltype(data.end())
 	return data.end();
 }
 
+const auto Bulk::cbegin()->decltype(data.cbegin())
+{
+	SPDLOG_TRACE(my::my_logger, "auto Bulk::cbegin()");
+
+	return data.cbegin();
+}
+
+const auto Bulk::cend()->decltype(data.cend())
+{
+	SPDLOG_TRACE(my::my_logger, "auto Bulk::cend()");
+
+	return data.cend();
+}
+
 void Bulk::append(const std::string &s)
 {
 	SPDLOG_TRACE(my::my_logger, "void Bulk::append");
@@ -40,6 +54,11 @@ void Bulk::append(const std::string &s)
 std::string Bulk::id()
 {
 	return m_id;
+}
+
+std::size_t Bulk::size()
+{
+	return data.size();
 }
 
 
@@ -72,6 +91,9 @@ void Bulk_Reader::remove_printer(const std::weak_ptr<Bulk_Printer> &prt)
         { 
             return !(p.owner_before(prt) || prt.owner_before(p));
         });
+
+    // Про удаление из деструктора
+    // https://stackoverflow.com/q/28338978
 }
 
 void Bulk_Reader::process()
@@ -159,6 +181,7 @@ void Bulk_Reader::notify(Bulk &b)
 	{
 		if(auto prt = it.lock())
 			prt->update(b);
+		else my::my_logger->warn("Bulk_Printer expired now");
 	}
 }
 
@@ -176,10 +199,10 @@ void Con_Printer::update(Bulk &b)
 	SPDLOG_TRACE(my::my_logger, "void Con_Printer::update");
 
 	std::cout << "bulk " << b.id() << ": ";
-	auto it = b.begin();
+	auto it = b.cbegin();
 	std::cout << *it;
 	it++;
-	for(; it != b.end(); it++)
+	for(; it != b.cend(); it++)
 	{
 		std::cout << ", " << *it;
 	}
