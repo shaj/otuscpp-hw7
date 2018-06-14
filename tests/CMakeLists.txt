@@ -28,7 +28,6 @@ target_link_libraries(test_logic
   ${Boost_LIBRARIES}
 )
 
-enable_testing()
 
 add_test(test_func test_func)
 add_test(test_logic test_logic)

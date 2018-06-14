@@ -55,4 +55,6 @@ configure_file("${PROJECT_SOURCE_DIR}/tests/t2.txt" "${PROJECT_BINARY_DIR}/t2.tx
 configure_file("${PROJECT_SOURCE_DIR}/tests/t3.txt" "${PROJECT_BINARY_DIR}/t3.txt" COPYONLY)
 configure_file("${PROJECT_SOURCE_DIR}/tests/t4.txt" "${PROJECT_BINARY_DIR}/t4.txt" COPYONLY)
 
+enable_testing()
+
 add_subdirectory(tests)
