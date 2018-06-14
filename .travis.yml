@@ -1,7 +1,6 @@
 language: cpp
 before_script:
   - sudo apt-get install libboost-test-dev -y
-  - sudo apt-get install libboost-log-dev -y
   - sudo apt-get install libboost-program-options-dev -y
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -y
@@ -13,9 +12,7 @@ before_script:
 script:
   - cmake .
   - cmake --build .
-  - cd tests
   - cmake --build . --target test
-  - cd ..
   - cmake --build . --target package
   - doxygen
 deploy:
