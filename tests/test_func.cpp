@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(test_bulk_class_id)
 {
 	Bulk b;
 	std::cout << b.id() << "\nsize = " << b.id().size() << std::endl;
-	BOOST_CHECK(b.id().size() == 10);
+	BOOST_CHECK(b.id().size() > 0);
 }
 
 BOOST_AUTO_TEST_CASE(test_bulk_append) 
@@ -79,38 +79,42 @@ BOOST_AUTO_TEST_CASE(test_bulk_iterators)
 }
 
 
-// class printer_test : test_bulk_remove_printer
-// {
-// 	printer_test(const std::weak_ptr<Bulk_Reader> &r)
-// 	{
-// 		reader = r;
-// 	}
+class printer_test : public Bulk_Printer
+{
+	printer_test(const std::weak_ptr<Bulk_Reader> &r)
+	{
+		reader = r;
+	}
 
-// public:	
-// 	std::vector<int> result;
+public:	
+	std::vector<int> result;
 
-// 	static std::shared_ptr<printer_test> create(const std::weak_ptr<Bulk_Reader> &r)
-// 	{
-// 		auto ret = std::shared_ptr<printer_test>(new printer_test(r));
-// 		return ret;
-// 	}
+	static std::shared_ptr<printer_test> create(const std::weak_ptr<Bulk_Reader> &r)
+	{
+		return std::shared_ptr<printer_test>(new printer_test(r));
+	}
 
 
-// 	void update(Bulk &b) override
-// 	{
-// 		int c = 0;
-// 		for(const auto &it: b) c++;
-// 		result.push_back(c);
-// 	}
-// };
+	void update(Bulk &b) override
+	{
+		int c = 0;
+		for(const auto &it: b) c++;
+		result.push_back(c);
+	}
+};
 
-// BOOST_AUTO_TEST_CASE(test_bulk_add_printer) 
-// {
-// 	std::istringstream in_data { "cmd0\n"
-// 								  "cmd2\n"
-// 	};
-// 	auto reader = std::make_shared<Bulk_Reader>(in_data, 3);
-// }
+BOOST_AUTO_TEST_CASE(test_bulk_add_printer) 
+{
+	std::istringstream in_data { "cmd0\n"
+								  "cmd2\n"
+	};
+	auto reader = std::make_shared<Bulk_Reader>(in_data, 3);
+	auto prt = printer_test::create(reader);
+	BOOST_CHECK_NO_THROW(reader->add_printer(prt));
+	BOOST_CHECK_NO_THROW(reader->process());
+	std::vector<int> a{2};
+	BOOST_CHECK(prt->result == a);
+}
 
 BOOST_AUTO_TEST_CASE(test_bulk_remove_printer) 
 {

@@ -11,6 +11,21 @@
 
 std::shared_ptr<spdlog::logger> my::my_logger;
 
+
+struct F {
+    F()           
+    {
+    	std::cout << "Create logger" << std::endl; 
+		my::my_logger = spdlog::basic_logger_st("mainlogger", "bulk.log", true);
+		my::my_logger->set_level(spdlog::level::info);
+    }
+    ~F()         
+    { 
+    	std::cout << "Destroy logger" << std::endl; 
+    }
+};
+ 
+
 class bulk_checker : public Bulk_Printer
 {
 	bulk_checker() = delete;
@@ -40,6 +55,8 @@ public:
 
 
 BOOST_AUTO_TEST_SUITE(bulk_logic_test_suite)
+
+BOOST_GLOBAL_FIXTURE( F )
 
 BOOST_AUTO_TEST_CASE(test_bulk1) 
 {
