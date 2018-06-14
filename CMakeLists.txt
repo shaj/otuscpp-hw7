@@ -10,7 +10,6 @@ endif()
 project(bulk VERSION 0.0.${PATCH_VERSION})
 
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
-find_package(Boost COMPONENTS log REQUIRED)
 find_package(Boost COMPONENTS program_options REQUIRED)
 find_package(Threads)
 
