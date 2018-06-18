@@ -14,7 +14,7 @@ namespace po = boost::program_options;
 
 void set_bulk(std::size_t val)
 {
-	std::cout << "bulk size is " << val << std::endl;
+	// std::cout << "bulk size is " << val << std::endl;
 }
 
 std::shared_ptr<spdlog::logger> my::my_logger;
@@ -59,6 +59,7 @@ int main (int argc, char* argv[])
 		if(vm.count("debug"))
 		{
 			my::my_logger->set_level(spdlog::level::trace);
+			my::my_logger->flush_on(spdlog::level::trace); 
 		}
 
 

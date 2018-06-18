@@ -103,7 +103,6 @@ void Bulk_Reader::process()
 	if(is)
 	{
 		std::string str;
-		int bulk_cnt = bulk_size;
 		create_bulk();
 		while(std::getline(is, str))
 		{
@@ -137,13 +136,21 @@ void Bulk_Reader::append_bulk(const std::string &s)
 			}
 			level++;
 		}
+		else if (s == "}")
+		{
+		}
 		else if(bulk_cnt)
 		{
 			(--bulks.end())->append(s);
 			bulk_cnt--;
+			if(bulk_cnt == 0)
+			{
+				notify(*(--bulks.end()));
+				create_bulk();
+			}
 		}
 		else
-		{
+		{ // TODO: Проверить: возможно это невызываемый код.
 			notify(*(--bulks.end()));
 			create_bulk();
 			(--bulks.end())->append(s);
@@ -198,15 +205,18 @@ void Con_Printer::update(Bulk &b)
 {
 	SPDLOG_TRACE(my::my_logger, "void Con_Printer::update");
 
-	std::cout << "bulk " << b.id() << ": ";
-	auto it = b.cbegin();
-	std::cout << *it;
-	it++;
-	for(; it != b.cend(); it++)
+	if(b.size() != 0)
 	{
-		std::cout << ", " << *it;
+		std::cout << "bulk: ";
+		auto it = b.cbegin();
+		std::cout << *it;
+		it++;
+		for(; it != b.cend(); it++)
+		{
+			std::cout << ", " << *it;
+		}
+		std::cout << std::endl;
 	}
-	std::cout << std::endl;
 }
 
 std::shared_ptr<Con_Printer> Con_Printer::create(const std::weak_ptr<Bulk_Reader> &r)
@@ -230,32 +240,45 @@ void File_Printer::update(Bulk &b)
 {
 	SPDLOG_TRACE(my::my_logger, "void File_Printer::update");
 
-	std::string fname {"bulk" + b.id()};
-	std::fstream fs;
-	fs.open(fname + ".log", std::ios::in);
-	if(fs)
+	if(b.size() != 0)
 	{
-		int cnt = 1;
-		std::string fname_new;
-		while(fs)
+		std::string fname {"bulk" + b.id()};
+		std::fstream fs;
+		fs.open(fname + ".log", std::ios::in);
+		if(fs)
 		{
-			fs.close();
-			fname_new = fname + "_" + std::to_string(cnt);
-			fs.open(fname_new + ".log");
-			cnt++;
-			if(cnt > 10000) throw std::logic_error("Can not create log file");
+			int cnt = 1;
+			std::string fname_new;
+			while(fs)
+			{
+				fs.close();
+				fname_new = fname + "_" + std::to_string(cnt);
+				fs.open(fname_new + ".log");
+				cnt++;
+				if(cnt > 1000) throw std::logic_error("File_Printer can not create log file");
+			}
+			fname = fname_new;
 		}
-		fname = fname_new;
+		fs.close();
+		
+		SPDLOG_TRACE(my::my_logger, "   fname={}", fname);
+		fs.clear(); // Иначе сразу возникает исключение потому что fs уже использовался.
+		fs.exceptions(std::fstream::failbit | std::fstream::badbit);
+		try
+		{ // Отсюда: https://stackoverflow.com/a/40057555
+			fs.open(fname + ".log", std::ios::out);
+			for(const auto &it: b)
+			{
+				fs << it << std::endl;
+			}
+			fs.close();
+		}
+		catch (std::fstream::failure e) 
+		{
+		    my::my_logger->error("File_Printer can not write data to file");
+		    throw std::runtime_error("File_Printer can not write data to file");
+		}
 	}
-	fs.close();
-	SPDLOG_TRACE(my::my_logger, "   fname={}", fname);
-	fs.open(fname + ".log", std::ios::out);
-
-	for(const auto &it: b)
-	{
-		fs << it << std::endl;
-	}
-	fs.close();
 }
 
 std::shared_ptr<File_Printer> File_Printer::create(const std::weak_ptr<Bulk_Reader> &r)
