@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <ctime>
+// #include <cstdio>
 
 #include "bulk.h"
 #include "log.h"
@@ -269,9 +270,10 @@ void File_Printer::update(Bulk &b)
 		SPDLOG_TRACE(my::my_logger, "   fname={}", fname);
 		fs.clear(); // Иначе сразу возникает исключение потому что fs уже использовался.
 		fs.exceptions(std::fstream::failbit | std::fstream::badbit);
+		fname += ".log";
 		try
 		{ // Отсюда: https://stackoverflow.com/a/40057555
-			fs.open(fname + ".log", std::ios::out);
+			fs.open(fname, std::ios::out);
 			for(const auto &it: b)
 			{
 				fs << it << std::endl;
@@ -281,7 +283,7 @@ void File_Printer::update(Bulk &b)
 		catch (std::fstream::failure e) 
 		{
             if(fs.is_open()) fs.close();
-            std::remove(fname + ".log");
+            std::remove(fname.c_str());
 		    my::my_logger->error("File_Printer can not write data to file");
 		    throw std::runtime_error("File_Printer can not write data to file");
 		}
