@@ -280,6 +280,8 @@ void File_Printer::update(Bulk &b)
 		}
 		catch (std::fstream::failure e) 
 		{
+            if(fs.is_open()) fs.close();
+            std::remove(fname + ".log");
 		    my::my_logger->error("File_Printer can not write data to file");
 		    throw std::runtime_error("File_Printer can not write data to file");
 		}
