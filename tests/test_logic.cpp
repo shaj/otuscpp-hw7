@@ -12,7 +12,8 @@
 std::shared_ptr<spdlog::logger> my::my_logger;
 
 
-struct F {
+struct F 
+{
     F()           
     {
     	std::cout << "Create logger" << std::endl; 
@@ -47,9 +48,7 @@ public:
 
 	void update(Bulk &b) override
 	{
-		int c = 0;
-		for(const auto &it: b) c++;
-		result.push_back(c);
+		result.push_back(b.size());
 	}
 };
 
@@ -161,6 +160,98 @@ BOOST_AUTO_TEST_CASE(test_bulk4)
 	BOOST_CHECK(checker->result == a);
 }
 
+
+BOOST_AUTO_TEST_CASE(test_bulk5) 
+{
+
+	std::istringstream in_data { "{\n"
+								  "}"
+	};
+
+	auto reader = std::make_shared<Bulk_Reader>(in_data, 3);
+	auto checker = bulk_checker::create(reader);
+
+	BOOST_CHECK_NO_THROW(reader->process());
+
+	std::cout << checker->result.size() << '\n';
+	for(const auto &it: checker->result)
+	{
+		std::cout << it << '\n';
+	}
+	std::cout << std::endl;
+
+	std::vector<int> a{0};
+	BOOST_CHECK(checker->result.size() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(test_bulk6) 
+{
+
+	std::istringstream in_data { "}\n"
+								  "}\n"
+								  "}"
+	};
+
+	auto reader = std::make_shared<Bulk_Reader>(in_data, 3);
+	auto checker = bulk_checker::create(reader);
+
+	BOOST_CHECK_NO_THROW(reader->process());
+
+	std::cout << checker->result.size() << '\n';
+	for(const auto &it: checker->result)
+	{
+		std::cout << it << '\n';
+	}
+	std::cout << std::endl;
+
+	std::vector<int> a{0};
+	BOOST_CHECK(checker->result.size() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(test_bulk7) 
+{
+
+	std::istringstream in_data {""};
+
+	auto reader = std::make_shared<Bulk_Reader>(in_data, 3);
+	auto checker = bulk_checker::create(reader);
+
+	BOOST_CHECK_NO_THROW(reader->process());
+
+	std::cout << checker->result.size() << '\n';
+	for(const auto &it: checker->result)
+	{
+		std::cout << it << '\n';
+	}
+	std::cout << std::endl;
+
+	std::vector<int> a{0};
+	BOOST_CHECK(checker->result.size() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(test_bulk8) 
+{
+
+	std::istringstream in_data {"{ {\n"
+								"}\n"
+								"}\n"
+	};
+
+	auto reader = std::make_shared<Bulk_Reader>(in_data, 3);
+	auto checker = bulk_checker::create(reader);
+
+	BOOST_CHECK_NO_THROW(reader->process());
+
+	std::cout << checker->result.size() << '\n';
+	for(const auto &it: checker->result)
+	{
+		std::cout << it << '\n';
+	}
+	std::cout << std::endl;
+
+	std::vector<int> a{1};
+	BOOST_CHECK(checker->result == a);
+}
 
 
 BOOST_AUTO_TEST_SUITE_END()

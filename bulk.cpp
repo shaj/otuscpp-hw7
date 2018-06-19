@@ -70,7 +70,11 @@ Bulk_Reader::Bulk_Reader(std::istream &_is, std::size_t c) :
 {
 	SPDLOG_TRACE(my::my_logger, "Bulk_Reader::Bulk_Reader");
 
-	if(bulk_size < 1) bulk_size = 1;
+	if(bulk_size < 1)
+	{
+		my::my_logger->warn("Bulk size is 0");
+		std::cout << "Bulk size is 0" << std::endl;
+	}
 
 	SPDLOG_TRACE(my::my_logger, "   bulk_size={}", bulk_size);
 }
@@ -150,11 +154,9 @@ void Bulk_Reader::append_bulk(const std::string &s)
 			}
 		}
 		else
-		{ // TODO: Проверить: возможно это невызываемый код.
-			notify(*(--bulks.end()));
-			create_bulk();
-			(--bulks.end())->append(s);
-			bulk_cnt--;
+		{ // Сюда попадаем, если bulk_size == 0.
+			my::my_logger->warn("Bulk size is 0");
+			// do nothing
 		}
 	}
 	else
@@ -184,11 +186,14 @@ void Bulk_Reader::notify(Bulk &b)
 {
 	SPDLOG_TRACE(my::my_logger, "void Bulk_Reader::notify");
 
-	for(const auto &it: printers)
+	if(b.size() != 0)
 	{
-		if(auto prt = it.lock())
-			prt->update(b);
-		else my::my_logger->warn("Bulk_Printer expired now");
+		for(const auto &it: printers)
+		{
+			if(auto prt = it.lock())
+				prt->update(b);
+			else my::my_logger->warn("Bulk_Printer expired now");
+		}
 	}
 }
 

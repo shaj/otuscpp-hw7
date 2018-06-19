@@ -11,7 +11,8 @@
 
 std::shared_ptr<spdlog::logger> my::my_logger;
 
-struct F {
+struct F 
+{
     F()           
     {
     	std::cout << "Create logger" << std::endl; 
@@ -97,9 +98,7 @@ public:
 
 	void update(Bulk &b) override
 	{
-		int c = 0;
-		for(const auto &it: b) c++;
-		result.push_back(c);
+		result.push_back(b.size());
 	}
 };
 
