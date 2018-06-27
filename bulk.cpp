@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <ctime>
 // #include <cstdio>
@@ -54,14 +55,35 @@ void Bulk::append(const std::string &s)
 
 std::string Bulk::id()
 {
+	SPDLOG_TRACE(my::my_logger, "std::string Bulk::id");
+
 	return m_id;
 }
 
 std::size_t Bulk::size()
 {
+	SPDLOG_TRACE(my::my_logger, "std::size_t Bulk::size");
+
 	return data.size();
 }
 
+std::string Bulk::to_str()
+{
+	SPDLOG_TRACE(my::my_logger, "std::string Bulk::to_str");
+
+	std::ostringstream retval;
+	if(data.size() != 0)
+	{
+		auto it = data.cbegin();
+		retval << *it;
+		it++;
+		for(; it != data.cend(); it++)
+		{
+			retval << ", " << *it;
+		}
+	}
+	return retval.str();
+}
 
 
 Bulk_Reader::Bulk_Reader(std::istream &_is, std::size_t c) : 
@@ -213,15 +235,7 @@ void Con_Printer::update(Bulk &b)
 
 	if(b.size() != 0)
 	{
-		std::cout << "bulk: ";
-		auto it = b.cbegin();
-		std::cout << *it;
-		it++;
-		for(; it != b.cend(); it++)
-		{
-			std::cout << ", " << *it;
-		}
-		std::cout << std::endl;
+		std::cout << "bulk: " << b.to_str() << std::endl;
 	}
 }
 
@@ -275,10 +289,7 @@ void File_Printer::update(Bulk &b)
 		{ // Отсюда: https://stackoverflow.com/a/40057555
 			fso.exceptions(std::fstream::failbit | std::fstream::badbit);
 			fso.open(fname, std::ios::out);
-			for(const auto &it: b)
-			{
-				fso << it << std::endl;
-			}
+			fso << b.to_str();
 			fso.close();
 		}
 		catch (std::fstream::failure &e) 

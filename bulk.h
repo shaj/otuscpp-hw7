@@ -22,6 +22,7 @@ public:
 	void append(const std::string &s);
 	std::string id();
 	std::size_t size();
+	std::string to_str();
 };
 
 

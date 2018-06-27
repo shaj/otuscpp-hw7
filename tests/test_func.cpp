@@ -47,6 +47,16 @@ BOOST_AUTO_TEST_CASE(test_bulk_append)
 	BOOST_CHECK(b.size() == 10);
 }
 
+BOOST_AUTO_TEST_CASE(test_bulk_to_str) 
+{
+	Bulk b;
+	for(int i=0; i<10; i++)
+	{
+		BOOST_CHECK_NO_THROW(b.append(std::string("cmd" + std::to_string(i))));
+	}
+	BOOST_CHECK(b.to_str() == "cmd0, cmd1, cmd2, cmd3, cmd4, cmd5, cmd6, cmd7, cmd8, cmd9");
+}
+
 BOOST_AUTO_TEST_CASE(test_bulk_iterators) 
 {
 	Bulk b;
