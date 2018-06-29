@@ -23,6 +23,9 @@ public:
 	std::string id();
 	std::size_t size();
 	std::string to_str();
+
+private:
+	void update_id();	
 };
 
 

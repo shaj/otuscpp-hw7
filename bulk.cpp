@@ -14,8 +14,7 @@ Bulk::Bulk()
 {
 	SPDLOG_TRACE(my::my_logger, "Bulk::Bulk()");
 
-	std::time_t t = std::time(nullptr);
-	m_id = std::to_string((long long)t);
+	update_id();
 }
 
 auto Bulk::begin()->decltype(data.begin())
@@ -50,7 +49,14 @@ void Bulk::append(const std::string &s)
 {
 	SPDLOG_TRACE(my::my_logger, "void Bulk::append");
 
+	if(data.size() == 0) update_id();
 	data.push_back(s);
+}
+
+void Bulk::update_id()
+{
+	std::time_t t = std::time(nullptr);
+	m_id = std::to_string((long long)t);
 }
 
 std::string Bulk::id()
@@ -289,7 +295,7 @@ void File_Printer::update(Bulk &b)
 		{ // Отсюда: https://stackoverflow.com/a/40057555
 			fso.exceptions(std::fstream::failbit | std::fstream::badbit);
 			fso.open(fname, std::ios::out);
-			fso << b.to_str();
+			fso << "bulk: " << b.to_str();
 			fso.close();
 		}
 		catch (std::fstream::failure &e) 
