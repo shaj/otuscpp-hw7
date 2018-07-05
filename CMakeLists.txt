@@ -46,6 +46,7 @@ include (CPack)
 
 configure_file("${PROJECT_SOURCE_DIR}/version.h.in" "${PROJECT_BINARY_DIR}/version.h" @ONLY)
 target_include_directories(bulk PUBLIC "${PROJECT_BINARY_DIR}")
+target_include_directories(bulk PUBLIC spdlog/include)
 
 configure_file("${PROJECT_SOURCE_DIR}/bintray.json.in" "${PROJECT_BINARY_DIR}/bintray.json")
 

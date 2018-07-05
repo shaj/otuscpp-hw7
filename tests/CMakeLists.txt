@@ -17,6 +17,8 @@ set_target_properties(test_func test_logic PROPERTIES
 
 target_include_directories(test_func PRIVATE ..)
 target_include_directories(test_logic PRIVATE ..)
+target_include_directories(test_func PRIVATE ../spdlog/include)
+target_include_directories(test_logic PRIVATE ../spdlog/include)
 
 target_link_libraries(test_func
   ${CMAKE_THREAD_LIBS_INIT}
