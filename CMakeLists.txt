@@ -25,10 +25,8 @@ set_target_properties(bulk PROPERTIES
 )
 
 target_link_libraries(bulk
-  ${Boost_LIBRARIES}
-#  ${Boost_SYSTEM_LIBRARY}
-#  ${Boost_THREAD_LIBRARY}
-  ${CMAKE_THREAD_LIBS_INIT}
+  ${Boost_LIBRARIES}          # program_options
+  ${CMAKE_THREAD_LIBS_INIT}   # spdlog
 )
 
 if((NOT CMAKE_BUILD_TYPE) OR (CMAKE_BUILD_TYPE EQUAL "Debug"))

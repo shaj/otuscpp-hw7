@@ -20,9 +20,9 @@ public:
 	const auto cend()->decltype(data.cend());
 
 	void append(const std::string &s);
-	std::string id();
-	std::size_t size();
-	std::string to_str();
+	std::string id() const;
+	std::size_t size() const;
+	std::string to_str() const;
 
 private:
 	void update_id();	
@@ -49,13 +49,14 @@ public:
 	void add_printer(const std::weak_ptr<Bulk_Printer> &p);
 	void remove_printer(const std::weak_ptr<Bulk_Printer> &p);
 
+	void process();
+
+private:
 	void create_bulk();
 	void append_bulk(const std::string &s);
 	void close_bulk();
-	// void push_bulk();
 
-	void process();
-	void notify(Bulk &b);
+	void notify(const Bulk &b);
 	
 };
 
@@ -65,7 +66,7 @@ class Bulk_Printer
 protected:
 	std::weak_ptr<Bulk_Reader> reader;
 public:
-	virtual void update(Bulk &b) = 0;	
+	virtual void update(const Bulk &b) = 0;	
 };
 
 
@@ -75,7 +76,7 @@ class Con_Printer: public Bulk_Printer
 	Con_Printer(const std::weak_ptr<Bulk_Reader> &r);
 public:	
 	static std::shared_ptr<Con_Printer> create(const std::weak_ptr<Bulk_Reader> &r);
-	void update(Bulk &b) override;
+	void update(const Bulk &b) override;
 };
 
 
@@ -85,5 +86,5 @@ class File_Printer: public Bulk_Printer
 	File_Printer(const std::weak_ptr<Bulk_Reader> &r);
 public:	
 	static std::shared_ptr<File_Printer> create(const std::weak_ptr<Bulk_Reader> &r);
-	void update(Bulk &b) override;
+	void update(const Bulk &b) override;
 };

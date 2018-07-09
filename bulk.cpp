@@ -59,21 +59,21 @@ void Bulk::update_id()
 	m_id = std::to_string((long long)t);
 }
 
-std::string Bulk::id()
+std::string Bulk::id() const
 {
 	SPDLOG_TRACE(my::my_logger, "std::string Bulk::id");
 
 	return m_id;
 }
 
-std::size_t Bulk::size()
+std::size_t Bulk::size() const
 {
 	SPDLOG_TRACE(my::my_logger, "std::size_t Bulk::size");
 
 	return data.size();
 }
 
-std::string Bulk::to_str()
+std::string Bulk::to_str() const
 {
 	SPDLOG_TRACE(my::my_logger, "std::string Bulk::to_str");
 
@@ -211,7 +211,7 @@ void Bulk_Reader::close_bulk()
 		notify(*(--bulks.end()));
 }
 
-void Bulk_Reader::notify(Bulk &b)
+void Bulk_Reader::notify(const Bulk &b)
 {
 	SPDLOG_TRACE(my::my_logger, "void Bulk_Reader::notify");
 
@@ -235,7 +235,7 @@ Con_Printer::Con_Printer(const std::weak_ptr<Bulk_Reader> &r)
 	reader = r;
 }
 
-void Con_Printer::update(Bulk &b) 
+void Con_Printer::update(const Bulk &b) 
 {
 	SPDLOG_TRACE(my::my_logger, "void Con_Printer::update");
 
@@ -262,7 +262,7 @@ File_Printer::File_Printer(const std::weak_ptr<Bulk_Reader> &r)
 	reader = r;
 }
 
-void File_Printer::update(Bulk &b) 
+void File_Printer::update(const Bulk &b) 
 {
 	SPDLOG_TRACE(my::my_logger, "void File_Printer::update");
 

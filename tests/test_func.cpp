@@ -106,7 +106,7 @@ public:
 	}
 
 
-	void update(Bulk &b) override
+	void update(const Bulk &b) override
 	{
 		result.push_back(b.size());
 	}
