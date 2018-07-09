@@ -9,6 +9,8 @@ endif()
 
 project(bulk VERSION 0.1.${PATCH_VERSION})
 
+set(Boost_USE_STATIC_LIBS   ON)
+
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 find_package(Boost COMPONENTS program_options REQUIRED)
 find_package(Threads)
@@ -18,19 +20,20 @@ add_executable(bulk main.cpp bulk.cpp)
 set_target_properties(bulk PROPERTIES
   CXX_STANDARD 14
   CXX_STANDARD_REQUIRED ON
-  COMPILE_DEFINITIONS BOOST_LOG_DYN_LINK
   COMPILE_OPTIONS -Wpedantic -Wall -Wextra
   INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
 )
 
 target_link_libraries(bulk
   ${Boost_LIBRARIES}
-  ${Boost_SYSTEM_LIBRARY}
-  ${Boost_THREAD_LIBRARY}
+#  ${Boost_SYSTEM_LIBRARY}
+#  ${Boost_THREAD_LIBRARY}
   ${CMAKE_THREAD_LIBS_INIT}
 )
 
-target_compile_definitions(bulk PRIVATE SPDLOG_TRACE_ON)
+if((NOT CMAKE_BUILD_TYPE) OR (CMAKE_BUILD_TYPE EQUAL "Debug"))
+  target_compile_definitions(bulk PRIVATE SPDLOG_TRACE_ON)
+endif()
 
 install(TARGETS bulk RUNTIME DESTINATION bin)
 
@@ -45,8 +48,8 @@ set(CPACK_PACKAGE_CONTACT kolobrod2002@yandex.ru)
 include (CPack)
 
 configure_file("${PROJECT_SOURCE_DIR}/version.h.in" "${PROJECT_BINARY_DIR}/version.h" @ONLY)
-target_include_directories(bulk PUBLIC "${PROJECT_BINARY_DIR}")
-target_include_directories(bulk PUBLIC spdlog/include)
+target_include_directories(bulk PRIVATE "${PROJECT_BINARY_DIR}")
+target_include_directories(bulk PRIVATE spdlog/include)
 
 configure_file("${PROJECT_SOURCE_DIR}/bintray.json.in" "${PROJECT_BINARY_DIR}/bintray.json")
 

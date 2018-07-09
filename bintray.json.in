@@ -3,7 +3,7 @@
         "name": "@CPACK_PACKAGE_NAME@",
         "repo": "otuscpp",
         "subject": "andreyshaj",
-        "labels": ["sparse_matrix", "otuscpp", "otus"],
+        "labels": ["bulk", "otuscpp", "otus"],
         "public_download_numbers": false,
         "public_stats": false
     },
